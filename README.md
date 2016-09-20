@@ -1,3 +1,5 @@
+Usage: python airgraph.py SIN
+
 Loads a graph of airline routes onto snap.py. Then takes an airport (IATA or ICAO identifier), and finds largest airports not reachable in 2 hops max (1 stopover).
 
 Largest is defined as largest degree, i.e. biggest number of routes in+out.
