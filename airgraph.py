@@ -1,6 +1,9 @@
-import snap, csv
+import snap, csv, sys
 
 gg = snap.TNEANet.New() # Directed multigraph.
+
+srcPort = sys.argv[1]
+print srcPort
 
 currentID = 0
 airportToID = dict()
