@@ -1,57 +1,69 @@
 import snap, csv
 
-gg = snap.TNGraph.New() # NOTE - single edges.
+gg = snap.TNEANet.New() # Directed multigraph.
 
 currentID = 0
 airportToID = dict()
-allports = set()
+IDToAirport = dict()
+allports = set() # set of every airport ID
+
+def addToDicts(airportToID, IDToAirport, portName):
+	global currentID
+	if (portName not in airportToID):
+		airportToID[portName] = currentID
+		IDToAirport[currentID] = portName
+		currentID += 1
+		gg.AddNode(airportToID[portName])
+		allports.add(airportToID[portName])
 
 for row in csv.reader(open("routes.dat", "rb"), delimiter=","):
-	src = row[2]
+	src = row[2] # airport name (IATA or ICAO)
 	if (src not in airportToID):
-		airportToID[src] = currentID
-		currentID += 1
-		gg.AddNode(airportToID[src])
-		allports.add(airportToID[src])
+		addToDicts(airportToID, IDToAirport, src)
 	
-	dst = row[4]
+	dst = row[4] # airport name (IATA or ICAO)
 	if (dst not in airportToID):
-		airportToID[dst] = currentID
-		currentID += 1
-		gg.AddNode(airportToID[dst])
-		allports.add(airportToID[dst])
+		addToDicts(airportToID, IDToAirport, dst)
+		
 	gg.AddEdge(airportToID[src], airportToID[dst])
 	
 print "gg: Nodes %d, Edges %d" % (gg.GetNodes(), gg.GetEdges())
 
-
-SIN_id = airportToID["SIN"]
-DXB_id = airportToID["DXB"]
-
-
-def getOutNeigh(NI, reachable):
+def getOutNeigh(NI, reachable): # add all out-neighbors to reachable
 	outdeg = NI.GetOutDeg()
 	for ii in range(0, outdeg):
 		reachable.add(NI.GetOutNId(ii))
 
+def addNeighborsToReachable(reachable, nextReachable): # for all in reachable, add their neighbors to reachable
+	for port in reachable:
+		ni = gg.GetNI(port)
+		getOutNeigh(ni, nextReachable)
 
-reachable = set()
-sin = gg.GetNI(SIN_id)
-dxb = gg.GetNI(DXB_id)
-nextReachable = set()
-getOutNeigh(sin, reachable)
+reachable = set() # IDs reachable in 1 hop
+nextReachable = set() # IDs reachable in 2 hops
 
-for port in reachable:
-	ni = gg.GetNI(port)
-	getOutNeigh(ni, nextReachable)
+
+getOutNeigh(gg.GetNI(airportToID["SIN"]), reachable)
+#getOutNeigh(gg.GetNI(airportToID["DXB"]), reachable)
+
+addNeighborsToReachable(reachable, nextReachable)
 
 allReachable = reachable | nextReachable
-unReachable = allports - allReachable
+
+unReachable = allports - allReachable # every airport ID that is not reachable in <= 1 hop
+
 print len(allports)
 print len(allReachable)
 print len(unReachable)
 
-IDToDeg = dict()
-
+tupList = list()
 for portID in unReachable:
-	
+	ni = gg.GetNI(portID)
+	deg = ni.GetDeg()
+	tup = (portID, deg)
+	tupList.append(tup)
+
+tupList.sort(key=lambda x: x[1], reverse=True)
+print tupList[:10]
+for ii in range(0, 10):
+	print IDToAirport[tupList[ii][0]] + " : " + str(tupList[ii][1])
