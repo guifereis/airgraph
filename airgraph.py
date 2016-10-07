@@ -45,9 +45,12 @@ def addNeighborsToReachable(reachable, nextReachable): # for all in reachable, a
 reachable = set() # IDs reachable in 1 hop
 nextReachable = set() # IDs reachable in 2 hops
 
-getOutNeigh(gg.GetNI(airportToID[srcPort]), reachable)
-#getOutNeigh(gg.GetNI(airportToID["SIN"]), reachable)
-#getOutNeigh(gg.GetNI(airportToID["DXB"]), reachable)
+#getOutNeigh(gg.GetNI(airportToID[srcPort]), reachable)
+
+getOutNeigh(gg.GetNI(airportToID["LHR"]), reachable)
+getOutNeigh(gg.GetNI(airportToID["LGW"]), reachable)
+#getOutNeigh(gg.GetNI(airportToID["JFK"]), reachable)
+#getOutNeigh(gg.GetNI(airportToID["SFO"]), reachable)
 
 addNeighborsToReachable(reachable, nextReachable)
 
