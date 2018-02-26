@@ -8,4 +8,4 @@ You will need snap.py installed for this to work: http://snap.stanford.edu/snapp
 
 Dataset is a couple years out of date so you must double-check there aren't actually valid 1-stop itins.
 
-Code is very quick and rough.
+Code is very quick and rough. Python 2.
